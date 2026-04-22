@@ -1,25 +1,27 @@
 # Spiral Search Simulation
 
-This program simulates different search strategies for finding a car parked on a street segment within an n-block Manhattan distance radius from the restaurant (origin). The car's location is sampled on street segments (midpoints of blocks) rather than at grid intersections.
+## Problem Statement
+
+You are at a restaurant (the origin) and your car is parked on some street segment within an n-block Manhattan distance. You want to minimize the expected walking distance to find it. This program simulates different search strategies and compares their performance via Monte Carlo simulation.
 
 ## Strategies
 
-1. **Spiral (Uniform)**: Expanding square spiral, visiting all segments within distance k before k+1. Does not double-back.
+1. **Spiral (Uniform)**: Expanding square spiral, visiting all segments within distance k before k+1. Optimal under uniform prior as it searches closer locations first.
    ![Spiral Path](spiral_uniform_path.png)
 
-2. **Cross + Spiral**: 4-armed cross with backtracking (walking out and back on each arm) then spiral the remaining segments. Includes return trips, leading to double-backing near the origin.
-   ![Cross Spiral Path](cross_spiral_path.png)
+2. **Cross + Spiral**: 4-armed cross with backtracking (walking out and back on each arm) then spiral the remaining segments. Includes return trips, leading to double-backing near the origin, which increases walking distance.
+   ![Cross Spiral Path](cross__spiral_path.png)
 
-3. **Random**: True random walk that can revisit segments, starting from the east segment from the origin and moving randomly to adjacent segments until finding the car.
-   (No visualization as path varies per trial)
+3. **Random**: True random walk that can revisit segments, starting from the east segment from the origin and moving randomly to adjacent segments until finding the car. Inefficient due to revisits, leading to higher expected distance.
+   ![Random Path](random_path.png)
 
-4. **East Biased Spiral**: Spiral biased towards positive x (east) direction.
+4. **East Biased Spiral**: Spiral biased towards positive x (east) direction. Useful if you remember walking east after parking.
    ![East Biased Spiral Path](east_biased_spiral_path.png)
 
-5. **Long Skinny Spiral**: Spiral optimized for long horizontal blocks, prioritizing horizontal movement.
+5. **Long Skinny Spiral**: Spiral optimized for long horizontal blocks, prioritizing horizontal movement within each distance ring.
    ![Long Skinny Spiral Path](long_skinny_spiral_path.png)
 
-6. **Residential Street**: Only searches segments not on the main streets (axes), assuming car is on residential streets.
+6. **Residential Street**: Only searches segments not on the main streets (axes), assuming car is on residential streets. Efficient if the car is indeed on residential streets.
    ![Residential Street Path](residential_street_path.png)
 
 ## Metrics
@@ -32,25 +34,6 @@ The program uses Monte Carlo simulation with 10,000 trials to estimate expected 
 - The walking distance is the cumulative length of segments walked up to and including the one with the car (each segment has length 1).
 - Results are averaged over all trials.
 
-- **Uniform Prior**: Assumes car is equally likely on any segment.
-- **East Bias Prior**: Segments with higher x (east) are more likely (weight = 1 + max(0, x)).
-- For Residential Street, assumes car is on residential street segments (not on axes).
-
-**Cross + Spiral Inefficiency**: The cross strategy includes return trips, meaning you walk back over segments you've already checked. This is visible in the path visualization as dense lines near the origin. While this may feel intuitive in practice, it increases the total walking distance compared to a pure spiral.
-
-**Random Walk vs Systematic**: The random walk can revisit segments, leading to much higher expected distance (O(n^2 log n) for coverage, but here for hitting a specific point it's still O(n^2) but with higher constant due to revisits). Systematic strategies are more efficient.
-
-## Output
-
-- Expected walking distance for each strategy under its appropriate prior.
-- Visualization plots saved as PNG files showing the walking path (connected midpoints colored by step order). Random walk is not visualized as it varies per trial.
-
-## Running
-
-```bash
-python spiral_search.py
-```
-
 ## Results
 
 For n=5 (220 street segments, Monte Carlo simulation with 10,000 trials):
@@ -62,4 +45,8 @@ For n=5 (220 street segments, Monte Carlo simulation with 10,000 trials):
 - Long Skinny Spiral: 109.88
 - Residential Street: 100.37
 
-The spiral performs similarly to random under uniform prior (as expected mathematically). The cross + spiral is less efficient due to backtracking. Residential street search is efficient if the car is on residential streets. The east biased spiral has higher expected distance due to the mismatch between path ordering and prior weighting.
+## Running
+
+```bash
+python spiral_search.py
+```

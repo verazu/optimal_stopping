@@ -201,5 +201,22 @@ def main():
     
     print("\nVisualizations saved as PNG files (random walk not visualized).")
 
+    # Generate sample random path for visualization
+    random.seed(42)  # For reproducibility
+    start_segment = ((0, 0), (1, 0))  # Horizontal segment from (0,0) to (1,0)
+    sample_random_path = [start_segment]
+    visited = set([start_segment])
+    current = start_segment
+    for _ in range(len(all_segments) * 2):  # Arbitrary limit to prevent infinite loop
+        neighbors = [n for n in get_neighbors(current, all_segments) if n not in visited]
+        if not neighbors:
+            break
+        current = random.choice(neighbors)
+        sample_random_path.append(current)
+        visited.add(current)
+    
+    # Visualize sample random path
+    visualize_path(sample_random_path, "Sample Random Walk Path", "random_path.png")
+
 if __name__ == "__main__":
     main()
